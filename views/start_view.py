@@ -5,7 +5,7 @@ from flet import View, Container, Column, Text, ElevatedButton
 class StartView(ft.View):
     """ Start view class """
 
-    def __init__(self, button_event):
+    def __init__(self, page: ft.Page):
         """ Create start view """
 
         self.content = View(
@@ -21,13 +21,13 @@ class StartView(ft.View):
                             alignment=ft.alignment.center
                         ),
                         Container( 
-                            content=ElevatedButton(text="Start", on_click=button_event),
+                            content=ElevatedButton(text="Start", on_click=lambda _: page.go("/training")),
                             alignment=ft.alignment.center
                         )
                     ])
                 ],
                 horizontal_alignment=ft.MainAxisAlignment.CENTER,
-                vertical_alignment=ft.CrossAxisAlignment.CENTER
+                vertical_alignment=ft.MainAxisAlignment.CENTER
             )
     
 

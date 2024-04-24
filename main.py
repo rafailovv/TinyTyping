@@ -1,6 +1,5 @@
 import flet as ft
-from flet import Page
-from flet import RouteChangeEvent
+from flet import Page, RouteChangeEvent
 
 from views.start_view import StartView
 from views.training_view import TrainingView
@@ -15,17 +14,17 @@ def main(page: Page) -> None:
     page.window_resizable = False
     page.theme_mode = ft.ThemeMode.LIGHT
 
-    start_view = StartView(button_event=lambda _: page.go("/training"))
-    training_view = TrainingView()
-
+    start_view = StartView(page)
+    training_view = TrainingView(page)
+    
+    
     def route_change(e: RouteChangeEvent) -> None:
         page.views.clear()
-        
-        # Start page
-        page.views.append(start_view.show())
 
-        # Training page
-        if page.route == "/training":
+        # Routing
+        if page.route == "/":
+            page.views.append(start_view.show())
+        elif page.route == "/training":
             page.views.append(training_view.show())
 
         page.update()
