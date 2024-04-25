@@ -11,9 +11,10 @@ def main(page: Page) -> None:
     page.title = "TinyTyping"
     page.window_width = 900
     page.window_height = 500
+    page.padding = 0
     page.window_resizable = False
     page.theme_mode = ft.ThemeMode.LIGHT
-
+    
     start_view = StartView(page)
     training_view = TrainingView(page)
     

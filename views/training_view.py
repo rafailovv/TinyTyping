@@ -26,8 +26,11 @@ class TrainingView(ft.View):
                         alignment=ft.alignment.center
                     )
                 ]),
-                Row(wrap=True, spacing=10, run_spacing=10, width=self.page.window_width, alignment=ft.MainAxisAlignment.CENTER,
-                    controls=[ElevatedButton(text="Go", on_click=lambda _: self.start_test()), ElevatedButton(text="Main Menu", on_click=lambda _: self._main_menu_button())])
+                Row(width=self.page.window_width, alignment=ft.MainAxisAlignment.CENTER,
+                    controls=[
+                        ElevatedButton(text="Go", on_click=lambda _: self.start_test()),
+                        ElevatedButton(text="Main Menu", on_click=lambda _: self._main_menu_button())
+                    ])
             ],
             horizontal_alignment=ft.MainAxisAlignment.CENTER,
             vertical_alignment=ft.MainAxisAlignment.CENTER
