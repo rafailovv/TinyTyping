@@ -7,10 +7,10 @@ class StartView(ft.View):
 
     def __init__(self, page: ft.Page):
         """ Create start view """
-        
+        super().__init__()
         self.page = page
         
-        background = Container(
+        self.background = Container(
             Image(
                 src="../img/start background.png",
                 width=self.page.window_width,
@@ -21,12 +21,13 @@ class StartView(ft.View):
                 color_blend_mode=ft.BlendMode.DARKEN
             )
         )
+        
 
         self.content = View(
                 route="/",
                 controls=[
                     Stack([
-                        background,
+                        self.background,
                         Column([
                             Container(
                                 content=Text("TinyTyping", size=32, selectable=True, color=ft.colors.GREEN_ACCENT_700),

@@ -11,89 +11,116 @@ class TrainingView(ft.View):
     def __init__(self, page: ft.Page):
         """ Create view """
         
+        super().__init__()
         self.page = page
+        self.info_text = Text("Проверишь свою скорость печати?", text_align=ft.TextAlign.CENTER) 
+        self.text_field = TextField(text_align=ft.TextAlign.CENTER, width=self.page.window_width * 0.75)
+        self.sub_text_container = Container(content=Text(text_align=ft.TextAlign.CENTER), alignment=ft.alignment.center)
+        
+        self.training_button = ElevatedButton(text="Training", on_click=lambda _: self._training())
+        self.back_button = ElevatedButton(text="Main Menu", on_click=lambda _: self._back_button())
+        
+        self.buttons = Row(width=self.page.window_width, alignment=ft.MainAxisAlignment.CENTER,
+                           controls=[
+                               self.training_button,
+                               self.back_button
+                               ])
         
         self.content = View(
             route="/training",
             controls=[
                 Column([
                     Container(
-                        content=Text("Проверишь свою скорость печати?", text_align=ft.TextAlign.CENTER),
+                        content=self.info_text,
                         alignment=ft.alignment.center
                     ),
                     Container(
-                        content=TextField(text_align=ft.TextAlign.CENTER, width=self.page.window_width * 0.75),
+                        content=self.text_field,
                         alignment=ft.alignment.center
                     )
                 ]),
-                Row(width=self.page.window_width, alignment=ft.MainAxisAlignment.CENTER,
-                    controls=[
-                        ElevatedButton(text="Go", on_click=lambda _: self.start_test()),
-                        ElevatedButton(text="Main Menu", on_click=lambda _: self._main_menu_button())
-                    ])
+                self.buttons
             ],
             horizontal_alignment=ft.MainAxisAlignment.CENTER,
             vertical_alignment=ft.MainAxisAlignment.CENTER
         )
         
+        self.state = "Menu"
     
-    def _main_menu_button(self):
+    
+    def _back_button(self):
         """ Main menu button """
         
-        # Clear text field
-        self.content.controls[0].controls[1].content.value = ""
-        self.content.controls[0].controls[0].content.value = "Проверишь свою скорость печати?"
-        
-        self.page.go("/")
+        if self.state == "Training":
+            self.words = []
+        else:
+            self.info_text.value = "Проверишь свою скорость печати?"
+            self.text_field.value = ""
+            self.training_button.disabled = False
+            self.back_button.disabled = False
+                
+            if self.sub_text_container in self.content.controls:
+                self.content.controls.remove(self.sub_text_container)
+            
+            self.page.go("/")
     
     
-    def start_test(self):
+    def _training(self):
         """ Start typing test """
         
-        test_words = lorem.get_sentence(1).replace('.', '').split()
+        self.state = "Training"
+        self.back_button.text = "Stop"
+        self.training_button.disabled = True
+        self.back_button.disabled = True
+        self.words = lorem.get_word(5).replace('.', '').split()
         
-        # Delete buttons
-        self.content.controls.pop(1)
+        if self.sub_text_container in self.content.controls:
+            self.content.controls.remove(self.sub_text_container)
         
-        # Add timer
-        self.content.controls.append(Container(content=Text("0", text_align=ft.TextAlign.CENTER),
-                                               alignment=ft.alignment.center))
+        # Add sub text
+        self.content.controls.insert(-1, self.sub_text_container)
+        self.page.update()
         
         # Countdown
         for i in range(3, 0, -1):
-            self.content.controls[-1].content.value = i
+            self.sub_text_container.content.value = i
             self.page.update()
             time.sleep(1)
         
-        # Create async timer
-        self.content.controls[-1].content.value = "START!"
+        self.sub_text_container.content.value = "START!"
         self.page.update()
         time.sleep(1)
         
         # Start test
         i = 0
         right_words_count = 0
-        while i < len(test_words):
-            self.content.controls[0].controls[0].content.value = test_words[i]
-            self.content.controls[-1].content.value = f"Правильные слова: {right_words_count}"
+        self.back_button.disabled = False
+        while i < len(self.words):
+            
+            # Extending word list when duty cycle more then 0.75
+            if i / len(self.words) >= 0.75:
+                self.words.extend(lorem.get_word(len(self.words)).replace('.', '').split())
+            
+            self.info_text.value = self.words[i]
+            self.sub_text_container.content.value = f"Правильные слова: {right_words_count}"
             self.page.update()
             
             if keyboard.is_pressed("enter"):
-                self.content.controls[0].controls[1].content.focus()
-                if self.content.controls[0].controls[1].content.value == self.content.controls[0].controls[0].content.value:
+                self.text_field.focus()
+                if self.text_field.value == self.info_text.value:
                     i += 1
                     right_words_count += 1
-                    self.content.controls[0].controls[1].content.value = ""
+                    self.text_field.value = ""
                     
-        self.content.controls[-1].content.value = f"Правильные слова: {right_words_count}"
-        self.content.controls[0].controls[0].content.value = "Отличный результат! Попробуете улучшить его?"
-        self.content.controls.pop()
-        self.content.controls.append(Row(wrap=True, spacing=10, run_spacing=10, width=self.page.window_width, alignment=ft.MainAxisAlignment.CENTER,
-                    controls=[ElevatedButton(text="Go", on_click=lambda _: self.start_test()), ElevatedButton(text="Main Menu", on_click=lambda _: self._main_menu_button())]))
+        self.sub_text_container.content.value = f"Правильные слова: {right_words_count}"
+        self.info_text.value = "Отличный результат! Попробуете улучшить его?"
+        self.training_button.disabled = False
+        self.back_button.text = "Main Menu"
+        self.state = "Menu"
         self.page.update()
         
         
     def show(self):
         """ Show view """
-
+        
         return self.content

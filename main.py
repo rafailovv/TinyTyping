@@ -18,7 +18,6 @@ def main(page: Page) -> None:
     start_view = StartView(page)
     training_view = TrainingView(page)
     
-    
     def route_change(e: RouteChangeEvent) -> None:
         page.views.clear()
 
