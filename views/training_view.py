@@ -97,9 +97,11 @@ class TrainingView(ft.View):
         self.back_button.disabled = False
         while i < len(self.words):
             
-            # Extending word list when duty cycle more then 0.75
-            if i / len(self.words) >= 0.75:
-                self.words.extend(lorem.get_word(len(self.words)).replace('.', '').split())
+            # Extending word list
+            if i == len(self.words) - 1:
+                self.words = self.words[i:i+1] + lorem.get_word((i+1) * 2).replace('.', '').split()
+                print(self.words)
+                i = 0
             
             self.info_text.value = self.words[i]
             self.sub_text_container.content.value = f"Правильные слова: {right_words_count}"

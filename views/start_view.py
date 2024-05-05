@@ -7,6 +7,7 @@ class StartView(ft.View):
 
     def __init__(self, page: ft.Page):
         """ Create start view """
+        
         super().__init__()
         self.page = page
         
